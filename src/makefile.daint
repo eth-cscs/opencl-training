@@ -1,10 +1,14 @@
+# ---------------------------------------------------------
+# https://bitbucket.org/jgphpc/pug/issue/28/opencl-training
+# ---------------------------------------------------------
 CC  = cc # or clang
 CXX = CC # or clang++
 
 H := $(shell echo $(HOST) | tr [a-z] [A-Z] | tr -d [0-9] )
 
 
-ifeq ($H,DAINT)
+#ifeq ($H,DAINT)
+ifeq ($H,SANTIS)
 #ifeq ($(PE_ENV),INTEL)
 # -----------------------------------
 ifneq ($(PE_ENV),GNU)
@@ -21,7 +25,7 @@ MPI_HOME=$(CRAY_MPICH2_DIR)
 CFLAGS	= 
 CXXFLAGS += -I$(MPI_HOME)/include
 CXXFLAGS += -I$(CLSDK)/include 
-CXXFLAGS += -g -O0 -w
+CXXFLAGS += -w # -g -O0 -w
 LDFLAGS = $(CXXFLAGS) \
 -L$(CLLIB)/lib64 -lOpenCL \
 -L${MPI_HOME}/lib -lmpich
@@ -39,7 +43,8 @@ OBJ     = 10_mpi.o
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
 
-$(H).$(PE_ENV): $(OBJ)
+N := $(shell echo $(OBJ) |cut -d_ -f1 )
+$(H).$(PE_ENV).$(N): $(OBJ)
 	$(CXX) $(LDFLAGS) $(OBJ) -o $@ $(DDTFLAG) $(DDTLINK)
 	@echo $(H) / $(PE_ENV) / executable ready
 
